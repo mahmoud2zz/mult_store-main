@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "317623873306",
+    "project_id": "multstore-b9b2e",
+    "storage_bucket": "multstore-b9b2e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317623873306:android:8593f08dc276f233e0c6a3",
+        "android_client_info": {
+          "package_name": "com.example.mult_store"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "317623873306-n76l7n1ps1bhauvkvnm6u7tteu9rcf6u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz2SpqoCv2N7fDv4jA67Y5K7wScRtMGYk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "317623873306-n76l7n1ps1bhauvkvnm6u7tteu9rcf6u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
