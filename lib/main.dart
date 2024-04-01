@@ -18,16 +18,8 @@ import 'model/stripe_id.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-
-
-
-
-
-
 
   Stripe.publishableKey =
       'pk_test_51Oyln8083VLmiQVuogILuKcC4tFectoDKiS9d5eMyXwem9mYZCSUVSJVMBVgLnAxLQ4Hl02wEZ8iyGrej3Jlky6X00JWetmEZv';
