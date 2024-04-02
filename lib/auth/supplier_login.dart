@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +11,7 @@ class SupplierLogin extends StatefulWidget {
   State<SupplierLogin> createState() => _SupplierLoginState();
 }
 
-class _SupplierLoginState extends State<SupplierLogin>  {
+class _SupplierLoginState extends State<SupplierLogin> {
   late String name;
   late String email;
   late String password;
@@ -21,7 +20,7 @@ class _SupplierLoginState extends State<SupplierLogin>  {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-  GlobalKey<ScaffoldMessengerState>();
+      GlobalKey<ScaffoldMessengerState>();
 
   bool passwordVisible = false;
 
@@ -31,8 +30,8 @@ class _SupplierLoginState extends State<SupplierLogin>  {
     });
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: email, password: password);
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
 
         _formKey.currentState!.reset();
         setState(() {
@@ -53,16 +52,15 @@ class _SupplierLoginState extends State<SupplierLogin>  {
           MyMessagesHandler.showSankBar(
               _scaffoldKey, 'Wrong password provided for that user.');
         }
-
       }
-
-    }  else {
+    } else {
       setState(() {
         processing = false;
       });
       MyMessagesHandler.showSankBar(_scaffoldKey, 'please fill all filed');
     }
   }
+
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
@@ -80,7 +78,7 @@ class _SupplierLoginState extends State<SupplierLogin>  {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding:  EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         child: AuthHeaderLabel(
                           headerLabel: 'Login In',
                         ),
@@ -146,21 +144,20 @@ class _SupplierLoginState extends State<SupplierLogin>  {
                         haveAccount: 'Dot\'n hava account?',
                         actionLabel: 'Sing Up',
                         onPressed: () =>
-                            Navigator.pushNamed(
-                                context, '/supplier_signup'),
+                            Navigator.pushNamed(context, '/supplier_signup'),
                       ),
-                      processing==true
+                      processing == true
                           ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.purple.shade500,
-                        ),
-                      )
+                              child: CircularProgressIndicator(
+                                color: Colors.purple.shade500,
+                              ),
+                            )
                           : AuthMainButton(
-                        mainButtonLabel: 'Login',
-                        onPressed: () {
-                          logIn();
-                        },
-                      ),
+                              mainButtonLabel: 'Login',
+                              onPressed: () {
+                                logIn();
+                              },
+                            ),
                     ],
                   ),
                 ),
@@ -171,10 +168,4 @@ class _SupplierLoginState extends State<SupplierLogin>  {
       ),
     );
   }
-
-
 }
-
-
-
-

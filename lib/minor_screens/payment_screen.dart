@@ -259,90 +259,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             ),
                                             YellowButton(
                                                 label:
-                                                    'Confirm${totalPrice.toStringAsFixed(2)}',
-                                                onPressed: () async {
-                                                  showProgress();
-                                                  for (var item in context
-                                                      .read<Cart>()
-                                                      .getItems) {
-                                                    CollectionReference
-                                                        orderRef =
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'orders');
-                                                    orderId = Uuid().v4();
-                                                    await orderRef
-                                                        .doc(orderId)
-                                                        .set({
-                                                      'cid': data['cid'],
-                                                      'custName': data['name'],
-                                                      'email': data['email'],
-                                                      'address':
-                                                          data['address'],
-                                                      'phone': data['phone'],
-                                                      'profileImage':
-                                                          data['profileImage'],
-                                                      'sid': item.suppId,
-                                                      'proId': item.documentId,
-                                                      'orderId': orderId,
-                                                      'orderName': item.name,
-                                                      'orderImage':
-                                                          item.imageUrl.first,
-                                                      'orderPrice': item.price,
-                                                      'orderQty': item.qty,
-                                                      'deliveryStatus':
-                                                          'preparing',
-                                                      'deliveryData': '',
-                                                      'orderDate':
-                                                          DateTime.now(),
-                                                      'paymentsStatus':
-                                                          'cash on delivery',
-                                                      'orderReview': false
-                                                    }).whenComplete(() async {
-                                                      await FirebaseFirestore
-                                                          .instance
-                                                          .runTransaction(
-                                                              (transaction) async {
-                                                        DocumentReference
-                                                            documentReference =
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'products')
-                                                                .doc(item
-                                                                    .documentId);
-                                                        DocumentSnapshot
-                                                            documentSnapshot =
-                                                            await transaction.get(
-                                                                documentReference);
-                                                        transaction.update(
-                                                            documentReference, {
-                                                          'instock':
-                                                              documentSnapshot[
-                                                                      'instock'] -
-                                                                  item.qty,
-                                                        });
-                                                      });
-                                                    });
-                                                  }
-                                                  context
-                                                      .read<Cart>()
-                                                      .clearCart();
-                                                  Navigator.popUntil(
-                                                      context,
-                                                      ModalRoute.withName(
-                                                          '/customer_home'));
-                                                },
+                                                    'Confirm${totalPaid.toStringAsFixed(2)}',
+                                                onPressed: () async {},
                                                 width: 0.9)
                                           ],
                                         ),
                                       ),
                                     ));
                           } else if (selectedValue == 2) {
-                            await mackPayment();
+                            int payment = totalPaid.round();
+                            int pay = payment * 100;
+                            await mackPayment(data, pay.toString());
                           } else if (selectedValue == 3) {
-                            await mackPayment();
+                            print('paypel');
                           }
                         },
                         width: 1,
@@ -360,32 +289,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Map<dynamic, dynamic>? paymentIntentDate;
-  Future<void> mackPayment() async {
-    paymentIntentDate = await createPaymentIntent();
+  Future<void> mackPayment(Map<String, dynamic> data, String total) async {
+    paymentIntentDate = await createPaymentIntent(total, 'USD');
     try {
       await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
+        applePay: const PaymentSheetApplePay(merchantCountryCode: 'DE'),
         merchantDisplayName: 'ANNIE',
-        paymentIntentClientSecret: paymentIntentDate!['client_secret'],
         allowsDelayedPaymentMethods: true,
-        applePay: PaymentSheetApplePay(merchantCountryCode: 'US'),
-        googlePay: PaymentSheetGooglePay(
-          merchantCountryCode: 'US',
-        ),
+        paymentIntentClientSecret: paymentIntentDate!['client_secret'],
       ));
 
-      await displayPaymentSheet();
+      await displayPaymentSheet(data);
     } catch (e) {
       print('___1');
       print(e.toString());
     }
   }
 
-  createPaymentIntent() async {
+  createPaymentIntent(String total, String currency) async {
     try {
       Map<String, dynamic> body = {
-        'amount': '1200',
-        'currency': 'USD',
+        'amount': total,
+        'currency': currency,
         'payment_method_types[]': 'card'
       };
       final response = await http.post(
@@ -402,15 +328,53 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  displayPaymentSheet() async {
+  displayPaymentSheet(Map<String, dynamic> data) async {
     try {
       await Stripe.instance.presentPaymentSheet().then((value) {
         setState(() {
           paymentIntentDate = null;
         });
       });
-
       print('Done');
+      showProgress();
+      for (var item in context.read<Cart>().getItems) {
+        CollectionReference orderRef =
+            FirebaseFirestore.instance.collection('orders');
+        orderId = Uuid().v4();
+        await orderRef.doc(orderId).set({
+          'cid': data['cid'],
+          'custName': data['name'],
+          'email': data['email'],
+          'address': data['address'],
+          'phone': data['phone'],
+          'profileImage': data['profileImage'],
+          'sid': item.suppId,
+          'proId': item.documentId,
+          'orderId': orderId,
+          'orderName': item.name,
+          'orderImage': item.imageUrl.first,
+          'orderPrice': item.price,
+          'orderQty': item.qty,
+          'deliveryStatus': 'preparing',
+          'deliveryData': '',
+          'orderDate': DateTime.now(),
+          'paymentsStatus': 'paid online',
+          'orderReview': false
+        }).whenComplete(() async {
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            DocumentReference documentReference = FirebaseFirestore.instance
+                .collection('products')
+                .doc(item.documentId);
+            DocumentSnapshot documentSnapshot =
+                await transaction.get(documentReference);
+            transaction.update(documentReference, {
+              'instock': documentSnapshot['instock'] - item.qty,
+            });
+          });
+        });
+      }
+      context.read<Cart>().clearCart();
+      Navigator.popUntil(context, ModalRoute.withName('/customer_home'));
     } catch (e) {
       print('failed');
       print(e.toString());

@@ -53,6 +53,7 @@ dependencies:
   flutter_datetime_picker_plus: ^2.1.0
   flutter_stripe: ^10.0.0
   http:
+  flutter_rating_bar: ^4.0.1
 
 
 

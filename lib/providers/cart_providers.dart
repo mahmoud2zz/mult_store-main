@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:mult_store/providers/product_class.dart';
 
-
 class Cart extends ChangeNotifier {
   final List<Product> _list = [];
 
@@ -19,8 +18,8 @@ class Cart extends ChangeNotifier {
 
   int get count => _list.length;
 
-  void addItems(String nameee, double price, dynamic qty, dynamic qntty, List imageUrl,
-      String documentId, String suppId) {
+  void addItems(String nameee, double price, dynamic qty, dynamic qntty,
+      List imageUrl, String documentId, String suppId) {
     Product product = Product(
         name: nameee,
         price: price,

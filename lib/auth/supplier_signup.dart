@@ -235,7 +235,8 @@ class _SupplierRegisterState extends State<SupplierRegister> {
                             } else if (value.isValidEmail() == false) {
                               return 'invalid email';
                             } else if (value.isValidEmail() == true) {
-                              MyMessagesHandler.showSankBar(_scaffoldKey, 'your  email is valid');
+                              MyMessagesHandler.showSankBar(
+                                  _scaffoldKey, 'your  email is valid');
                             }
                             return null;
                           },
