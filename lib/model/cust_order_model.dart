@@ -1,17 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:mult_store/widget/yellow_button.dart';
 
-class CustmorOrderModel extends StatelessWidget {
+class CustmorOrderModel extends StatefulWidget {
   CustmorOrderModel({
     super.key,
     required this.order,
   });
 
   final dynamic order;
+
+  @override
+  State<CustmorOrderModel> createState() => _CustmorOrderModelState();
+}
+
+class _CustmorOrderModelState extends State<CustmorOrderModel> {
   late double rate;
+
   late String comment;
 
   @override
@@ -32,14 +40,14 @@ class CustmorOrderModel extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 15),
                   child: Container(
                     constraints: BoxConstraints(maxHeight: 80, maxWidth: 80),
-                    child: Image.network(order['orderImage']),
+                    child: Image.network(widget.order['orderImage']),
                   ),
                 ),
                 Flexible(
                     child: Column(
                   children: [
                     Text(
-                      order['orderName'],
+                      widget.order['orderName'],
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(
@@ -52,9 +60,9 @@ class CustmorOrderModel extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                              ('\$ ') + order['orderPrice'].toStringAsFixed(2)),
-                          Text(('x') + '${order['orderQty']}')
+                          Text(('\$ ') +
+                              widget.order['orderPrice'].toStringAsFixed(2)),
+                          Text(('x') + '${widget.order['orderQty']}')
                         ],
                       ),
                     )
@@ -68,14 +76,14 @@ class CustmorOrderModel extends StatelessWidget {
             children: [
               Text('See More ..'),
               Text(
-                order['deliveryStatus'],
+                widget.order['deliveryStatus'],
               )
             ],
           ),
           children: [
             Container(
               decoration: BoxDecoration(
-                color: order['deliveryStatus'] == 'delivered'
+                color: widget.order['deliveryStatus'] == 'delivered'
                     ? Colors.brown.withOpacity(0.2)
                     : Colors.yellow.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(15),
@@ -86,19 +94,19 @@ class CustmorOrderModel extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      ('Name: ') + (order['orderName']),
+                      ('Name: ') + (widget.order['orderName']),
                       style: TextStyle(fontSize: 15),
                     ),
                     Text(
-                      ('Phone No: ') + (order['phone']),
+                      ('Phone No: ') + (widget.order['phone']),
                       style: TextStyle(fontSize: 15),
                     ),
                     Text(
-                      ('Email Address: ') + (order['email']),
+                      ('Email Address: ') + (widget.order['email']),
                       style: TextStyle(fontSize: 15),
                     ),
                     Text(
-                      ('Address: ') + (order['address']),
+                      ('Address: ') + (widget.order['address']),
                       style: TextStyle(fontSize: 15),
                     ),
                     Row(
@@ -108,7 +116,7 @@ class CustmorOrderModel extends StatelessWidget {
                           style: TextStyle(fontSize: 15),
                         ),
                         Text(
-                          order['paymentsStatus'],
+                          widget.order['paymentsStatus'],
                           style:
                               TextStyle(color: Colors.deepPurple, fontSize: 15),
                         )
@@ -119,7 +127,7 @@ class CustmorOrderModel extends StatelessWidget {
                         Text(('Delivery status: '),
                             style: TextStyle(fontSize: 15)),
                         Text(
-                          order['deliveryStatus'],
+                          widget.order['deliveryStatus'],
                           style: TextStyle(
                             color: Colors.green,
                             fontSize: 15,
@@ -127,14 +135,14 @@ class CustmorOrderModel extends StatelessWidget {
                         )
                       ],
                     ),
-                    order['deliveryStatus'] == 'shipping'
+                    widget.order['deliveryStatus'] == 'shipping'
                         ? Text(('Estimated Delivery Data: ') +
                             DateFormat('yyyy--MM--dd')
-                                .format(order['deliveryData'].toDate())
+                                .format(widget.order['deliveryData'].toDate())
                                 .toString())
                         : Text(''),
-                    order['deliveryStatus'] == 'delivered' &&
-                            order['orderReview'] == false
+                    widget.order['deliveryStatus'] == 'delivered' &&
+                            widget.order['orderReview'] == false
                         ? TextButton(
                             onPressed: () {
                               showDialog(
@@ -145,8 +153,11 @@ class CustmorOrderModel extends StatelessWidget {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 20, vertical: 10),
                                           child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
                                             children: [
                                               RatingBar.builder(
+                                                allowHalfRating: true,
                                                 initialRating: 1,
                                                 maxRating: 2,
                                                 itemBuilder: (context, _) =>
@@ -207,8 +218,60 @@ class CustmorOrderModel extends StatelessWidget {
                                                   ),
                                                   YellowButton(
                                                     label: 'OK',
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
+                                                    onPressed: () async {
+                                                      CollectionReference
+                                                          collRef =
+                                                          FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'products')
+                                                              .doc(widget.order[
+                                                                  'proID'])
+                                                              .collection(
+                                                                  'reviews');
+
+                                                      await collRef
+                                                          .doc(FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid)
+                                                          .set({
+                                                        'name': widget
+                                                            .order['custName'],
+                                                        'email': widget
+                                                            .order['email'],
+                                                        'rate': rate,
+                                                        'comment': comment,
+                                                        'profileImage': '' ?? ''
+                                                      }).whenComplete(() async {
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .runTransaction(
+                                                                (transaction) async {
+                                                          DocumentReference
+                                                              documentReference =
+                                                              await FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'orders')
+                                                                  .doc(widget
+                                                                          .order[
+                                                                      'orderId']);
+                                                          await transaction.update(
+                                                              documentReference,
+                                                              {
+                                                                'orderReviews':
+                                                                    true,
+                                                              });
+                                                        });
+                                                      });
+                                                      await Future.delayed(
+                                                              Duration(
+                                                                  microseconds:
+                                                                      100))
+                                                          .whenComplete(() {
+                                                        Navigator.pop(context);
+                                                      });
                                                     },
                                                     width: 0.3,
                                                   )
@@ -221,8 +284,8 @@ class CustmorOrderModel extends StatelessWidget {
                             },
                             child: Text('Write Reviwe'))
                         : Text(''),
-                    order['deliveryStatus'] == 'delivered' &&
-                            order['orderReview'] == true
+                    widget.order['deliveryStatus'] == 'delivered' &&
+                            widget.order['orderReview'] == true
                         ? Row(
                             children: [
                               Icon(

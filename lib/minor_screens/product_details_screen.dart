@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:mult_store/customer_screens/cart.dart';
@@ -180,7 +181,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         ))
                             ],
                           ),
-                          widget.proList['instock'] <=0
+                          widget.proList['instock'] <= 0
                               ? Text(
                                   'The item is out of stock',
                                   style: TextStyle(
