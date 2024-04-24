@@ -12,7 +12,8 @@ class SupplierLogin extends StatefulWidget {
 }
 
 class _SupplierLoginState extends State<SupplierLogin> {
-  late String name;
+  late String name = 's';
+
   late String email;
   late String password;
   late String profileImage;
@@ -22,7 +23,7 @@ class _SupplierLoginState extends State<SupplierLogin> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
       GlobalKey<ScaffoldMessengerState>();
 
-  bool passwordVisible = false;
+  bool passwordVisible = true;
 
   void logIn() async {
     setState(() {
@@ -37,6 +38,7 @@ class _SupplierLoginState extends State<SupplierLogin> {
         setState(() {
           processing = false;
         });
+        print(FirebaseAuth.instance.currentUser!.displayName);
         Navigator.pushNamed(context, '/suppler_home');
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {

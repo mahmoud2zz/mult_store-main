@@ -154,20 +154,21 @@ class SupplierOrderModel extends StatelessWidget {
                                               .collection('orders')
                                               .doc(order['orderId'])
                                               .update({
-                                            'deliveryStatus':'shipping',
-                                            'deliveryData':data,
+                                            'deliveryStatus': 'shipping',
+                                            'deliveryData': data,
                                           });
                                         });
                                       },
                                       child: Text('shipping ?'))
                                   : TextButton(
-                                      onPressed: ()async { await FirebaseFirestore.instance
-                                          .collection('orders')
-                                          .doc(order['orderId'])
-                                          .update({
-                                        'deliveryStatus':'delivered',
-
-                                      });},
+                                      onPressed: () async {
+                                        await FirebaseFirestore.instance
+                                            .collection('orders')
+                                            .doc(order['orderId'])
+                                            .update({
+                                          'deliveryStatus': 'delivered',
+                                        });
+                                      },
                                       child: Text('delivered ')),
                             ],
                           )

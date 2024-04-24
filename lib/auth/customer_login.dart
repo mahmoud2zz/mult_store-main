@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +20,9 @@ class _CustomerLoginState extends State<CustomerLogin> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
-  GlobalKey<ScaffoldMessengerState>();
+      GlobalKey<ScaffoldMessengerState>();
 
-  bool passwordVisible = false;
+  bool passwordVisible = true;
 
   void logIn() async {
     setState(() {
@@ -31,16 +30,15 @@ class _CustomerLoginState extends State<CustomerLogin> {
     });
     if (_formKey.currentState!.validate()) {
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: email, password: password);
+        await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: email, password: password);
 
         _formKey.currentState!.reset();
 
-
         Navigator.pushNamed(context, '/customer_home');
-      setState(() {
-        processing = false;
-      });
+        setState(() {
+          processing = false;
+        });
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           setState(() {
@@ -55,16 +53,15 @@ class _CustomerLoginState extends State<CustomerLogin> {
           MyMessagesHandler.showSankBar(
               _scaffoldKey, 'Wrong password provided for that user.');
         }
-
       }
-
-    }  else {
+    } else {
       setState(() {
         processing = false;
       });
       MyMessagesHandler.showSankBar(_scaffoldKey, 'please fill all filed');
     }
   }
+
   Widget build(BuildContext context) {
     return ScaffoldMessenger(
       key: _scaffoldKey,
@@ -82,7 +79,7 @@ class _CustomerLoginState extends State<CustomerLogin> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding:  EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         child: AuthHeaderLabel(
                           headerLabel: 'Login In',
                         ),
@@ -148,21 +145,20 @@ class _CustomerLoginState extends State<CustomerLogin> {
                         haveAccount: 'Dot\'n hava account?',
                         actionLabel: 'Sing Up',
                         onPressed: () =>
-                            Navigator.pushNamed(
-                                context, '/customer_signup'),
+                            Navigator.pushNamed(context, '/customer_signup'),
                       ),
-                      processing==true
+                      processing == true
                           ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.purple.shade500,
-                        ),
-                      )
+                              child: CircularProgressIndicator(
+                                color: Colors.purple.shade500,
+                              ),
+                            )
                           : AuthMainButton(
-                        mainButtonLabel: 'Login',
-                        onPressed: () {
-                          logIn();
-                        },
-                      ),
+                              mainButtonLabel: 'Login',
+                              onPressed: () {
+                                logIn();
+                              },
+                            ),
                     ],
                   ),
                 ),
@@ -173,10 +169,4 @@ class _CustomerLoginState extends State<CustomerLogin> {
       ),
     );
   }
-
-
 }
-
-
-
-

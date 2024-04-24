@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mult_store/minor_screens/edite_products.dart';
 import 'package:mult_store/minor_screens/product_details_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
@@ -18,7 +19,6 @@ class ProductModel extends StatefulWidget {
 }
 
 class _ProductModelState extends State<ProductModel> {
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -31,7 +31,7 @@ class _ProductModelState extends State<ProductModel> {
                     )));
       },
       child: Padding(
-        padding: const EdgeInsets.all(6.0),
+        padding: EdgeInsets.all(6.0),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15), topRight: Radius.circular(15)),
@@ -73,20 +73,26 @@ class _ProductModelState extends State<ProductModel> {
                           widget.products['sid'] ==
                                   FirebaseAuth.instance.currentUser!.uid
                               ? IconButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EditeProducts(
+                                                  item: widget.products,
+                                                )));
+                                  },
                                   icon: Icon(Icons.edit),
                                   color: Colors.red,
                                 )
                               : IconButton(
                                   onPressed: () {
-                                    var existingItemWishList=     context
+                                    var existingItemWishList = context
                                         .read<Wish>()
                                         .getWishItems
                                         .firstWhereOrNull((product) =>
-                                    product.documentId ==
-                                        widget.products['proId']);
-                                    existingItemWishList!=
-                                            null
+                                            product.documentId ==
+                                            widget.products['proId']);
+                                    existingItemWishList != null
                                         ? context.read<Wish>().removeThisItem(
                                             widget.products['proId'])
                                         : context.read<Wish>().addWishItems(

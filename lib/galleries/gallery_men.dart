@@ -35,7 +35,12 @@ class _MenGalleryScreenState extends State<MenGalleryScreen> {
             return Center(
               child: Text(
                 'this category  has \n \n items yet !',
-                style: TextStyle(fontSize: 26, color: Colors.blueGrey,fontWeight:FontWeight.bold,fontFamily: 'Acme',letterSpacing: 1.5),
+                style: TextStyle(
+                    fontSize: 26,
+                    color: Colors.blueGrey,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Acme',
+                    letterSpacing: 1.5),
                 textAlign: TextAlign.center,
               ),
             );
@@ -48,7 +53,9 @@ class _MenGalleryScreenState extends State<MenGalleryScreen> {
               itemCount: snapshot.data!.size,
               crossAxisCount: 2,
               itemBuilder: (context, int index) {
-                return ProductModel(products: snapshot.data!.docs[index],);
+                return ProductModel(
+                  products: snapshot.data!.docs[index],
+                );
               },
               staggeredTileBuilder: (context) => StaggeredTile.fit(1),
             ),
@@ -56,4 +63,3 @@ class _MenGalleryScreenState extends State<MenGalleryScreen> {
         });
   }
 }
-

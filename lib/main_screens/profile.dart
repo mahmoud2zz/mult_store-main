@@ -2,18 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mult_store/customer_screens/address_book.dart';
 import 'package:mult_store/widget/appber_widgets.dart';
 import 'package:mult_store/widget/alert_dialog.dart';
-import '../customer_screens/cart.dart';
 import '../customer_screens/customer_order.dart';
 import '../customer_screens/wilshlist_.dart';
-import '../minor_screens/sub_categ_products.dart';
-import '../widget/alert_dialog.dart';
 import 'cart.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String documentId;
-   ProfileScreen({super.key, required this.documentId, });
+  ProfileScreen({
+    super.key,
+    required this.documentId,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -22,17 +23,17 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    CollectionReference customers =
+        FirebaseFirestore.instance.collection('customers');
+    CollectionReference anonymous =
+        FirebaseFirestore.instance.collection('anonymous');
 
-    CollectionReference customers = FirebaseFirestore.instance.collection('customers');
-    CollectionReference anonymous = FirebaseFirestore.instance.collection('anonymous');
-
-
-     return FutureBuilder<DocumentSnapshot>(
+    return FutureBuilder<DocumentSnapshot>(
       future: FirebaseAuth.instance.currentUser!.isAnonymous
-          ? anonymous.doc().get():customers.doc(widget.documentId).get(),
+          ? anonymous.doc().get()
+          : customers.doc(widget.documentId).get(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-
         if (snapshot.hasError) {
           return Text("Something went wrong");
         }
@@ -42,7 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+          Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
           print('-----------');
           print(data['profileImage']);
           return Scaffold(
@@ -52,8 +54,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Container(
                     height: 230,
                     decoration: BoxDecoration(
-                        gradient:
-                        LinearGradient(colors: [Colors.yellow, Colors.brown]))),
+                        gradient: LinearGradient(
+                            colors: [Colors.yellow, Colors.brown]))),
                 CustomScrollView(
                   physics: BouncingScrollPhysics(),
                   slivers: [
@@ -73,32 +75,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               child: Row(
                                 children: [
                                   Padding(
-                                    padding: EdgeInsets.only(left: 35, top: 20),
-                                    child:    data['profileImage']=='' ?CircleAvatar(
-                                      backgroundImage:
-                                      AssetImage('images/inapp/guest.jpg'),
-                                      radius: 50,
-                                    ):CircleAvatar(
-                                      backgroundImage:
-                                      NetworkImage(data['profileImage']),
-                                      radius: 50,
-                                    )
-
-                                  ),
+                                      padding:
+                                          EdgeInsets.only(left: 35, top: 20),
+                                      child: data['profileImage'] == ''
+                                          ? CircleAvatar(
+                                              backgroundImage: AssetImage(
+                                                  'images/inapp/guest.jpg'),
+                                              radius: 50,
+                                            )
+                                          : CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                  data['profileImage']),
+                                              radius: 50,
+                                            )),
                                   SizedBox(
                                     width: 25,
                                   ),
                                   Text(
-                                   data['name']=='' ?'guest': data['name'].toUpperCase(),
+                                    data['name'] == ''
+                                        ? 'guest'
+                                        : data['name'].toUpperCase(),
                                     style: TextStyle(
-                                        fontSize: 24, fontWeight: FontWeight.w600),
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w600),
                                   )
                                 ],
                               ),
                             ),
                             title: AnimatedOpacity(
                               duration: Duration(milliseconds: 200),
-                              opacity: constraints.biggest.height <= 120 ? 1 : 0,
+                              opacity:
+                                  constraints.biggest.height <= 120 ? 1 : 0,
                               child: Text(
                                 'Account',
                                 style: TextStyle(color: Colors.black),
@@ -120,7 +127,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(50)),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
@@ -132,18 +140,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     child: SizedBox(
                                       height: 60,
-                                      width: MediaQuery.of(context).size.width * 0.25,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
                                       child: TextButton(
                                         onPressed: () => Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                                builder: (context) => CartScreen(
-                                                  back: AppBeckButton(),
-                                                ))),
+                                                builder: (context) =>
+                                                    CartScreen(
+                                                      back: AppBeckButton(),
+                                                    ))),
                                         child: Text(
                                           'Cart',
                                           style: TextStyle(
-                                              color: Colors.yellow, fontSize: 20),
+                                              color: Colors.yellow,
+                                              fontSize: 20),
                                         ),
                                       ),
                                     ),
@@ -155,7 +166,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     child: SizedBox(
                                       height: 60,
-                                      width: MediaQuery.of(context).size.width * 0.25,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
                                       child: TextButton(
                                         onPressed: () => Navigator.push(
                                             context,
@@ -165,7 +177,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Text(
                                           'Orders',
                                           style: TextStyle(
-                                              color: Colors.black54, fontSize: 20),
+                                              color: Colors.black54,
+                                              fontSize: 20),
                                         ),
                                       ),
                                     ),
@@ -180,7 +193,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     child: SizedBox(
                                       height: 60,
-                                      width: MediaQuery.of(context).size.width * 0.25,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.25,
                                       child: TextButton(
                                         onPressed: () => Navigator.push(
                                             context,
@@ -190,7 +204,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Text(
                                           'Wishlist',
                                           style: TextStyle(
-                                              color: Colors.yellow, fontSize: 20),
+                                              color: Colors.yellow,
+                                              fontSize: 20),
                                         ),
                                       ),
                                     ),
@@ -215,26 +230,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     RepeatedListTile(
                                       title: 'Email No',
-                                      subtitle: data['email']==''?'example@email.com': data['email'],
+                                      subtitle: data['email'] == ''
+                                          ? 'example@email.com'
+                                          : data['email'],
                                       iconData: Icons.email,
                                     ),
                                     YellewDivider(),
                                     RepeatedListTile(
                                       title: 'Phone No',
-                                      subtitle: data['phone']==''?'example:+1111111':data['phone'],
+                                      subtitle: data['phone'] == ''
+                                          ? 'example:+1111111'
+                                          : data['phone'],
                                       iconData: Icons.phone,
                                     ),
                                     YellewDivider(),
                                     RepeatedListTile(
+                                      onTap: FirebaseAuth.instance.currentUser!
+                                                  .isAnonymous ==
+                                              true
+                                          ? null
+                                          : () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AddressBook()));
+                                            },
                                       title: ' Address',
-                                      subtitle: data['address']==''?' New Gersy_usa':data['address'],
+                                      subtitle: userAddress(data),
                                       iconData: Icons.location_pin,
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            ProfileHeaderLabel(headerLabel: '  Account Settings '),
+                            ProfileHeaderLabel(
+                                headerLabel: '  Account Settings '),
                             Padding(
                               padding: EdgeInsets.all(10),
                               child: Container(
@@ -264,11 +295,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         MyAlertDilaog.showMyDialog(
                                             context: context,
                                             title: 'Log out',
-                                            content: 'Are you sure to log out ?',
-                                            tabYes: () async{   await FirebaseAuth.instance.signOut();
-                                            Navigator.pop(context);
-                                            Navigator.pushReplacementNamed(
-                                                context, '/welcome_screen');},
+                                            content:
+                                                'Are you sure to log out ?',
+                                            tabYes: () async {
+                                              await FirebaseAuth.instance
+                                                  .signOut();
+                                              Navigator.pop(context);
+                                              Navigator.pushReplacementNamed(
+                                                  context, '/welcome_screen');
+                                            },
                                             tabNo: () {
                                               Navigator.pop(context);
                                             });
@@ -289,15 +324,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        return  Center(child: CircularProgressIndicator(color: Colors.purple,),);
+        return Center(
+          child: CircularProgressIndicator(
+            color: Colors.purple,
+          ),
+        );
       },
-
     );
+  }
 
+  userAddress(dynamic data) {
+    if (FirebaseAuth.instance.currentUser!.isAnonymous == true) {
+      return 'New Gersy_usa';
+    } else if (FirebaseAuth.instance.currentUser!.isAnonymous == false &&
+        data['address'] == '') {
+      return 'set your address';
+    } else {
+      return data['address'];
+    }
   }
 }
-
-
 
 class YellewDivider extends StatelessWidget {
   const YellewDivider({

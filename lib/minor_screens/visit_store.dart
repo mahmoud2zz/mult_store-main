@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mult_store/minor_screens/edite_store.dart';
 import 'package:mult_store/minor_screens/sub_categ_products.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_grid_view.dart';
 import 'package:staggered_grid_view_flutter/widgets/staggered_tile.dart';
@@ -58,10 +59,12 @@ class _VisitState extends State<VisitStore> {
             appBar: AppBar(
               toolbarHeight: 100,
               leading: AppBerYellowButton(),
-              flexibleSpace: Image.asset(
-                'images/inapp/coverimage.jpg',
-                fit: BoxFit.cover,
-              ),
+              flexibleSpace: data['coverImage'] == ''
+                  ? Image.asset('images/inapp/coverimage.jpg')
+                  : Image.network(
+                      data['coverImage'],
+                      fit: BoxFit.cover,
+                    ),
               title: Row(
                 children: [
                   Container(
@@ -110,9 +113,12 @@ class _VisitState extends State<VisitStore> {
                                 ),
                                 child: MaterialButton(
                                     onPressed: () {
-                                      setState(() {
-                                        following = !following;
-                                      });
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => EditeStore(
+                                                    data: data,
+                                                  )));
                                     },
                                     child: Row(
                                       children: [
@@ -203,7 +209,10 @@ class _VisitState extends State<VisitStore> {
             floatingActionButton: FloatingActionButton(
               backgroundColor: Colors.green,
               onPressed: () {},
-              child:const Icon(FontAwesomeIcons.whatsapp,size: 40,),
+              child: const Icon(
+                FontAwesomeIcons.whatsapp,
+                size: 40,
+              ),
             ),
           );
         } else {

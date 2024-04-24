@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mult_store/main_screens/visit_store.dart';
+import 'package:mult_store/minor_screens/visit_store.dart';
 
 import '../dashboard_compontes/edite_business.dart';
 import '../dashboard_compontes/manage_products.dart';

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mult_store/main_screens/visit_store.dart';
+import 'package:mult_store/minor_screens/visit_store.dart';
 
 import '../widget/appber_widgets.dart';
 
@@ -34,8 +34,13 @@ class StoresScreen extends StatelessWidget {
                       crossAxisSpacing: 25),
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap:(){
-                        Navigator.push(context,MaterialPageRoute(builder: (context)=> VisitStore(suppId: snapshot.data!.docs[index]['sid'],)));
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => VisitStore(
+                                      suppId: snapshot.data!.docs[index]['sid'],
+                                    )));
                       },
                       child: Column(
                         children: [
@@ -49,13 +54,16 @@ class StoresScreen extends StatelessWidget {
                                 ),
                               ),
                               Positioned(
-                                bottom: 28,
+                                  bottom: 28,
                                   left: 10,
                                   child: SizedBox(
                                     height: 48,
                                     width: 100,
                                     child: Image.network(
-                                        snapshot.data!.docs[index]['storeLogo'].toString(),fit: BoxFit.fill,),
+                                      snapshot.data!.docs[index]['storeLogo']
+                                          .toString(),
+                                      fit: BoxFit.fill,
+                                    ),
                                   ))
                             ],
                           ),

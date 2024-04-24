@@ -21,7 +21,14 @@ import '../widget/appber_widgets.dart';
 import '../widget/categ_widgets.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final String name;
+  final String phone;
+  final String address;
+  const PaymentScreen(
+      {super.key,
+      required this.name,
+      required this.phone,
+      required this.address});
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -260,7 +267,79 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             YellowButton(
                                                 label:
                                                     'Confirm${totalPaid.toStringAsFixed(2)}',
-                                                onPressed: () async {},
+                                                onPressed: () async {
+                                                  showProgress();
+                                                  for (var item in context
+                                                      .read<Cart>()
+                                                      .getItems) {
+                                                    CollectionReference
+                                                        orderRef =
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'orders');
+                                                    orderId = Uuid().v4();
+                                                    await orderRef
+                                                        .doc(orderId)
+                                                        .set({
+                                                      'cid': data['cid'],
+                                                      'custName': widget.name,
+                                                      'email': data['email'],
+                                                      'address': widget.address,
+                                                      'phone': widget.phone,
+                                                      'profileImage':
+                                                          data['profileImage'],
+                                                      'sid': item.suppId,
+                                                      'proId': item.documentId,
+                                                      'orderId': orderId,
+                                                      'orderName': item.name,
+                                                      'orderImage':
+                                                          item.imageUrl.first,
+                                                      'orderPrice': item.price,
+                                                      'orderQty': item.qty,
+                                                      'deliveryStatus':
+                                                          'delivered',
+                                                      'deliveryData': '',
+                                                      'orderDate':
+                                                          DateTime.now(),
+                                                      'paymentsStatus':
+                                                          'paid online',
+                                                      'orderReview': false
+                                                    }).whenComplete(() async {
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .runTransaction(
+                                                              (transaction) async {
+                                                        DocumentReference
+                                                            documentReference =
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'products')
+                                                                .doc(item
+                                                                    .documentId);
+                                                        DocumentSnapshot
+                                                            documentSnapshot =
+                                                            await transaction.get(
+                                                                documentReference);
+                                                        transaction.update(
+                                                            documentReference, {
+                                                          'instock':
+                                                              documentSnapshot[
+                                                                      'instock'] -
+                                                                  item.qty,
+                                                        });
+                                                      });
+                                                    });
+                                                  }
+                                                  context
+                                                      .read<Cart>()
+                                                      .clearCart();
+                                                  Navigator.popUntil(
+                                                      context,
+                                                      ModalRoute.withName(
+                                                          '/customer_home'));
+                                                },
                                                 width: 0.9)
                                           ],
                                         ),
@@ -380,7 +459,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       print(e.toString());
     }
   }
-  
 }
 
 class LabeledRadio extends StatelessWidget {

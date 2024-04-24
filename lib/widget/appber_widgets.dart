@@ -11,16 +11,14 @@ class AppBerTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding:EdgeInsets.zero,
-      child: Center(
-        child: Text(
-          title,
-          style: TextStyle(
-              color: Colors.black,
-              fontFamily: 'Acme',
-              fontSize: 30,
-              letterSpacing: 1.2,),
-
+      padding: EdgeInsets.zero,
+      child: Text(
+        title,
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'Acme',
+          fontSize: 30,
+          letterSpacing: 1.2,
         ),
       ),
     );

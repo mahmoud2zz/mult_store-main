@@ -41,19 +41,13 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
       var pickedImage = await _picker.pickMultiImage(
           maxHeight: 300, maxWidth: 300, imageQuality: 95);
       setState(() {
-        print('---23');
-        print(pickedImage);
-
         imagesFileList = pickedImage;
-        print(imagesFileList);
-
-        print('______________1');
+        print(imagesFileList!.length);
+        print('leanth');
       });
     } catch (e) {
       setState(() {
         pickedError = e;
-        print('______________3');
-        print(e);
       });
       print(pickedError);
     }
@@ -68,31 +62,28 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
   }
 
   Future<void> uploadImage() async {
-
     if (mainCateValue != 'select category' && subCateValue != 'subcategory') {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
+        setState(() {
+          processing = true;
+        });
         if (imagesFileList!.isNotEmpty) {
-          setState(() {
-            processing = true;
-          });
           try {
             for (var image in imagesFileList!) {
               firebase_storage.Reference ref = firebase_storage
                   .FirebaseStorage.instance
                   .ref('products/${path.basename(image.path)}');
-              print(ref.fullPath);
-              print('++++@');
-               await ref.putFile(File(image.path)).whenComplete(() {
-                ref.getDownloadURL().then((value) {
-                  print('----4');
-                  print(value);
-                setState(() {
-                  imagesUrlList.add(value);
-                  print(imagesUrlList.length);
-                  print('===========111');
 
-                });
+              await ref.putFile(File(image.path)).whenComplete(() async {
+                await ref.getDownloadURL().then((value) {
+                  print(value);
+
+                  setState(() {
+                    imagesUrlList.add(value);
+                  });
+
+                  print(imagesUrlList);
                 }).catchError((e) {
                   print('===========1');
                   print(e);
@@ -129,9 +120,9 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
     if (imagesUrlList.isNotEmpty) {
       CollectionReference products =
           FirebaseFirestore.instance.collection('products');
-      String proId =  Uuid().v4();
+      String proId = Uuid().v4();
       print(proId);
-      products.doc(proId).set({
+      await products.doc(proId).set({
         'proId': proId,
         'mainCate': mainCateValue,
         'subCate': subCateValue,
@@ -151,23 +142,16 @@ class _UploadProductScreenState extends State<UploadProductScreen> {
           subCateList = [];
           imagesUrlList = [];
         });
-        _formKey.currentState!.reset();
-
-      }).catchError((e){
-        print(e);
+      }).catchError((e) {
         setState(() {
-          processing=false;
-          imagesFileList=[];
+          processing = false;
+          imagesFileList = [];
+          imagesUrlList = [];
         });
         _formKey.currentState!.reset();
-
       });
     } else {
- print('qqq');
-      print('no images');
-
-    _formKey.currentState!.reset();
-
+      _formKey.currentState!.reset();
     }
   }
 

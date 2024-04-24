@@ -226,7 +226,7 @@ class _CustmorOrderModelState extends State<CustmorOrderModel> {
                                                               .collection(
                                                                   'products')
                                                               .doc(widget.order[
-                                                                  'proID'])
+                                                                  'proId'])
                                                               .collection(
                                                                   'reviews');
 
@@ -242,7 +242,10 @@ class _CustmorOrderModelState extends State<CustmorOrderModel> {
                                                             .order['email'],
                                                         'rate': rate,
                                                         'comment': comment,
-                                                        'profileImage': '' ?? ''
+                                                        'profileImage': widget
+                                                                    .order[
+                                                                'profileImage'] ??
+                                                            ''
                                                       }).whenComplete(() async {
                                                         await FirebaseFirestore
                                                             .instance

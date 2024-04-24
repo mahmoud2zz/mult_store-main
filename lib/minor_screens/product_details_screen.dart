@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expandable/expandable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:mult_store/customer_screens/cart.dart';
 import 'package:mult_store/minor_screens/full_screen_view.dart';
-import 'package:mult_store/main_screens/visit_store.dart';
+import 'package:mult_store/minor_screens/visit_store.dart';
 import 'package:mult_store/providers/product_class.dart';
 import 'package:mult_store/providers/wish_provider.dart';
 import 'package:mult_store/widget/appber_widgets.dart';
@@ -18,11 +19,12 @@ import '../providers/cart_providers.dart';
 import '../widget/yellow_button.dart';
 import '../main_screens/cart.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:expandable/expandable.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final dynamic proList;
 
-  ProductDetailsScreen({super.key, required this.proList});
+  const ProductDetailsScreen({super.key, required this.proList});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -33,6 +35,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       .collection('products')
       .where('mainCate', isEqualTo: widget.proList['mainCate'])
       .where('subCate', isEqualTo: widget.proList['subCate'])
+      .snapshots();
+  late final reviewsStream = FirebaseFirestore.instance
+      .collection('products')
+      .doc(widget.proList['proId'])
+      .collection('reviews')
       .snapshots();
 
   Product? existingItemCart;
@@ -212,6 +219,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ProductDetailsHeader(
                             label: ' Similar Item',
                           ),
+                          Stack(
+                            children: [
+                              Positioned(
+                                  top: 50, right: 50, child: Text('total')),
+                              ExpandableTheme(
+                                  data: ExpandableThemeData(
+                                      iconColor: Colors.blue, iconSize: 24),
+                                  child: reviews(reviewsStream)),
+                            ],
+                          ),
                           SizedBox(
                             child: StreamBuilder<QuerySnapshot>(
                                 stream: _productStream,
@@ -336,6 +353,80 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
     );
   }
+}
+
+Widget reviews(var reviewsStream) {
+  return ExpandablePanel(
+    header: Padding(
+      padding: const EdgeInsets.all(10),
+      child: Text('Reviwes',
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blue)),
+    ),
+    collapsed: SizedBox(
+      height: 230,
+      child: reviewsAll(reviewsStream),
+    ),
+    expanded: Text('expanded \n \n  expanded  \n \n   '),
+  );
+}
+
+Widget reviewsAll(var reviewsStream) {
+  return StreamBuilder<QuerySnapshot>(
+      stream: reviewsStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot2) {
+        if (snapshot2.hasError) {
+          return Text('Something went wrong');
+        }
+
+        if (snapshot2.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        if (snapshot2.data!.docs.isEmpty) {
+          return Center(
+            child: Text(
+              'this item  has \n \n Reviews yet !',
+              style: TextStyle(
+                  fontSize: 26,
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Acme',
+                  letterSpacing: 1.5),
+              textAlign: TextAlign.center,
+            ),
+          );
+        }
+
+        return ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: snapshot2.data!.docs.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundImage:
+                      NetworkImage(snapshot2.data!.docs[index]['profileImage']),
+                ),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(snapshot2.data!.docs[index]['name']),
+                    Row(
+                      children: [
+                        Text(snapshot2.data!.docs[index]['rate'].toString()),
+                        Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                subtitle: Text(snapshot2.data!.docs[index]['comment']),
+              );
+            });
+      });
 }
 
 class ProductDetailsHeader extends StatelessWidget {
